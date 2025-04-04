@@ -6,7 +6,7 @@ The **Xzamine** is a Chrome extension that helps users analyze tweets for compli
 ---
 
 ## Features
-- **Real-Time Tweet Analysis**: Adds a "Check Legality" button under each tweet on Twitter.
+- **Real-Time Tweet Analysis**: Adds a "Check Legality" button under each tweet on X (Twitter).
 - **Custom Tweet Checker**: Allows users to check tweet text for legality verification.
 - **AI-Powered Feedback**: Displays whether a tweet is compliant or violating, along with relevant details.
 - **Dynamic Integration**: Automatically detects new tweets and adds functionality.
@@ -31,15 +31,15 @@ The **Xzamine** is a Chrome extension that helps users analyze tweets for compli
 
 ## File Structure
 extension/
-├── icons/ # Extension icons 
-├── popup/ 
-│ ├── popup.html # Popup UI 
-│ ├── popup.css # Popup styling 
-│ └── popup.js # Popup functionality 
-├── content.js # Injects functionality into Twitter's UI 
-├── background.js # Handles background tasks and messaging 
-├── manifest.json # Extension configuration 
-└── README.md # Project documentation
+├── icons/              # Extension icons
+├── popup/              
+│   ├── popup.html      # Popup UI
+│   ├── popup.css       # Popup styling
+│   └── popup.js        # Popup functionality
+├── content.js          # Injects functionality into Twitter's UI
+├── background.js       # Handles background tasks and messaging
+├── manifest.json       # Extension configuration
+└── README.md           # Project documentation
 
 ---
 

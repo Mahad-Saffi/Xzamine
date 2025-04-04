@@ -6,7 +6,7 @@ The **Xzamine** is a Legal Tweet Checker that helps users analyze tweets for com
 ---
 
 ## Features
-- **Real-Time Tweet Analysis**: Adds a "Check Legality" button under each tweet on Twitter.
+- **Real-Time Tweet Analysis**: Adds a "Check Legality" button under each tweet on X (Twitter).
 - **Custom Tweet Checker**: Allows users to check tweet text for legality verification.
 - **AI-Powered Feedback**: Displays whether a tweet is compliant or violating, along with relevant details.
 - **Dynamic Integration**: Automatically detects new tweets and adds functionality.
