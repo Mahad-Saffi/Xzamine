@@ -86,10 +86,12 @@ const appendButtonToPosts = () => {
                     
                     // Change button color based on response
                     if (response.status === 'success') {
+                        button.innerText = 'Legal'; // Update button text
                         button.style.backgroundColor = '#328c14'; // green color
                         button.style.borderColor = '#328c14'; // green color
                         
                     } else if (response.status === 'failure') {
+                        button.innerText = 'Illegal'; // Update button text
                         button.style.backgroundColor = '#dc1919'; // red color
                         button.style.borderColor = '#dc1919'; // red color
                         button.disabled = true; // disable the button
