@@ -46,7 +46,7 @@ const appendButtonToPosts = () => {
             button.style.borderStyle = 'solid';
             button.style.fontSize = '15px';
             button.style.fontWeight = '700';
-            button.style.borderRadius = '5px';
+            button.style.borderRadius = '999px';
             button.style.textAlign = 'center';
             button.style.opacity = '1';
             
