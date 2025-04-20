@@ -19,16 +19,16 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     .then((data) => {
       console.log("AI model response: ", data);
 
-      const isLegal = data.isLegal;
+      const sentiment = data.sentiment;
 
-      if (isLegal) {
-        sendResponse({ status: "success", message: "Legal" });
-      } else {
-        sendResponse({ status: "failure", message: "Illegal" });
-      }
+      sendResponse({
+        status: "success",
+        message: "Post analyzed successfully",
+        sentiment: sentiment,
+      });
     })
     .catch((error) => {
-      console.error("Error checking legality:", error);
+      console.log("Error checking legality:", error);
       sendResponse({ status: "error", message: "Error" });
     });
 

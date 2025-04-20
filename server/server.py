@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from .model.xzamine import invoke_model
 from dotenv import load_dotenv
 import os
 
@@ -16,10 +17,21 @@ def home():
 @app.route("/data", methods=["POST"])
 def get_data():
     data = request.json
+    post = data.get("postTextBody")
     print("Received post data:", data)
+    
+    # result = invoke_model(post)
+    result = invoke_model(post)
+    
+    # highest_label, highest_value = max(result['probabilities'].items(), key=lambda x: x[1])
+    highest_label, highest_value = max(result['probabilities'].items(), key=lambda x: x[1])
+
+    print("Highest probability class:", highest_label)
+    print("Probability:", highest_value)
+    print("Result:", result)
 
     # from here call the model and get the result for now i have set it to the false making each post being analyzed illegal
-    return jsonify({"isLegal": False, "received": data})
+    return jsonify({"sentiment": highest_label, "received": data})
 
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=PORT)

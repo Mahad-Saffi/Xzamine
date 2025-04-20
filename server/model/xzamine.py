@@ -1,7 +1,7 @@
 from langchain_ollama import ChatOllama
 from langchain.prompts import ChatPromptTemplate
-from Xzamine.server.model.analysis_structured_output import Analysis
-from Xzamine.server.model.prompt import system_message
+from .analysis_structured_output import Analysis
+from .prompt import system_message
 
 
 model = ChatOllama(model="llama3.2:latest", temperature=0)

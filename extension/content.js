@@ -65,12 +65,6 @@ const appendButtonToPosts = () => {
                 const postOwnerUsername = allPostText[3];
                 const postTextBody = allPostText.slice(5, -4);
                 
-                // const postTextString = Array.from(postText).map(text => text).join(' ');
-                
-                // Log the text of the post to the console
-                // console.log('Post owner:', postOwner);
-                // console.log('Post owner username:', postOwnerUsername);
-                // console.log('Post text:', postTextBody.join(' '));
                 console.log('All Post text:', allPostText);
 
                 // Send the data to the background script
@@ -85,18 +79,19 @@ const appendButtonToPosts = () => {
                     button.style.opacity = '1';             // make the button opaque
                     
                     // Change button color based on response
-                    if (response.status === 'success') {
-                        button.innerText = 'Legal'; // Update button text
+                    if (response.status === 'success' && response.sentiment === 'Normal Post') {
+                        button.innerText = response.sentiment; // Update button text
                         button.style.backgroundColor = '#328c14'; // green color
                         button.style.borderColor = '#328c14'; // green color
                         
-                    } else if (response.status === 'failure') {
-                        button.innerText = 'Illegal'; // Update button text
+                    } else if (response.status === 'success' && response.sentiment !== 'Normal Post') {
+                        button.innerText = response.sentiment; // Update button text
                         button.style.backgroundColor = '#dc1919'; // red color
                         button.style.borderColor = '#dc1919'; // red color
-                        button.disabled = true; // disable the button
+                        // button.disabled = true; // disable the button
 
                     } else {
+                        button.innerText = 'Normal Post'; // Update button text
                         button.style.opacity = '0.5';
                     }
                 });

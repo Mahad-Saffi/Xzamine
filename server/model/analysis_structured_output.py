@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import Literal, Annotated, Dict
+from typing import Dict
 
 class Analysis(BaseModel):
     post: str = Field(description="The post to analyze")
