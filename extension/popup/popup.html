@@ -1,14 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="./popup.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Legal Tweet Checker</title>
+  <link rel="stylesheet" href="popup.css" />
+  <style>
+    html, body {
+      width: 420px;
+      height: 600px;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+  </style>
 </head>
 <body>
-  <h3 id="status">Connecting to backend...</h3>
-
-  <script src="./popup.js" defer></script>
+  <div class="container" style="width: 100%; height: 100%;">
+    <h3>Legal Tweet Checker</h3>
+    <div id="results"></div>
+    <button id="clear-history">Clear History</button>
+  </div>
+  <script src="popup.js"></script>
 </body>
 </html>

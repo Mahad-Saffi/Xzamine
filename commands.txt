@@ -1,0 +1,3 @@
+net start redis
+celery -A model.xzamine worker --loglevel=info
+python -m server server

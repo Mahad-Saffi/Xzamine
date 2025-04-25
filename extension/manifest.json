@@ -4,14 +4,13 @@
   "version": "1.0",
   "description": "AI-powered Chrome extension to check tweets for compliance with PECCA laws.",
   "host_permissions": [
-    "https://x.com/*"
+    "https://x.com/*",
+    "http://127.0.0.1:3000/*"
   ],
   "permissions": [
-    "declarativeNetRequest",
     "scripting",
     "storage",
-    "tabs",
-    "webRequest"
+    "tabs"
   ],
   "background": {
     "service_worker": "./background.js"
@@ -36,4 +35,3 @@
     }
   ]
 }
-

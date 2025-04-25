@@ -1,22 +1,21 @@
 from pydantic import BaseModel, Field
 from typing import Dict
 
+# Pydantic model for quick sentiment classification
+class SentimentResult(BaseModel):
+    final_sentiment: str = Field(
+        description="The legal classification of the post (e.g., 'Hate Speech (Sec 10A)' or 'Normal Post')"
+    )
+    confidence_score: float = Field(
+        description="The probability associated with the final_sentiment",
+        ge=0, le=1
+    )
+
+# Pydantic model for detailed analysis
 class Analysis(BaseModel):
-    post: str = Field(description="The post to analyze")
+    post: str = Field(description="The post to analyze")  # Added missing field
     probabilities: Dict[str, float] = Field(
-        description="Probabilities for each legal classification category",
-        examples={
-            "Hate Speech (Sec 10A)": 0.1,
-            "Cyber Terrorism (Sec 10)": 0.2,
-            "Dignity Offences (Sec 18)": 0.05,
-            "Modesty Offences (Sec 19)": 0.0,
-            "Child Pornography (Sec 19A)": 0.0,
-            "Cyber Stalking (Sec 21)": 0.05,
-            "Spoofing (Sec 23)": 0.0,
-            "Electronic Fraud (Sec 12)": 0.0,
-            "Glorification of Terrorism (Sec 9)": 0.1,
-            "Normal Post": 0.5
-        }
+        description="Probabilities for each legal classification category (e.g., 'Hate Speech (Sec 10A)': 0.1, 'Normal Post': 0.5)"
     )
     final_sentiment: str = Field(
         description="The legal classification with the highest probability"
@@ -41,4 +40,3 @@ class Analysis(BaseModel):
     protected_group_analysis: str = Field(
         description="Identification of targeted protected groups per PECA"
     )
-    

@@ -1,10 +1,233 @@
+/* popup.css - Refined Analysis Display */
+html, body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  width: 420px;
+  height: 600px;
+  margin: 0;
+  padding: 15px;
+  background-color: #f8f9fb;
+  color: #2d3436;
+  overflow-y: auto;
+}
 
-/* This file contains the CSS styles for the popup window of the extension. */
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
 
-body {
-   font-family: Arial, sans-serif;
-   text-align: center;
-   padding: 10px;
-   background-color: #f0f0f0;
-   color: #333;
- }
+h3 {
+  margin: 0 0 20px;
+  font-size: 22px;
+  font-weight: 800;
+  color: #1a1a1a;
+  text-align: center;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+/* Analysis Sections */
+.analysis-section {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 18px;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  transition: all 0.25s ease;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.analysis-section:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.sentiment-indicator {
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  text-align: center;
+}
+
+.sentiment-normal {
+  background: #e8f5e9;
+  color: #2e7d32;
+  border: 1px solid #a5d6a7;
+}
+
+.sentiment-warning {
+  background: #ffebee;
+  color: #c62828;
+  border: 1px solid #ef9a9a;
+}
+
+/* Probability Visualization */
+.probability-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.probability-item {
+  background: #f8f9fa;
+  padding: 12px;
+  border-radius: 8px;
+  position: relative;
+}
+
+.probability-label {
+  font-size: 13px;
+  color: #555;
+  margin-bottom: 6px;
+}
+
+.probability-bar {
+  height: 8px;
+  background: #e0e0e0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.probability-fill {
+  height: 100%;
+  background: #1d9bf0;
+  transition: width 0.4s ease;
+}
+
+.probability-value {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  font-weight: 600;
+  color: #2d3436;
+}
+
+/* Detailed Analysis Sections */
+.detail-card {
+  padding: 16px;
+  margin: 15px 0;
+  border-left: 4px solid;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.legal-definition {
+  border-color: #4caf50;
+  background: #f1f8e9;
+}
+
+.cultural-context {
+  border-color: #ff9800;
+  background: #fff3e0;
+}
+
+.protected-group {
+  border-color: #e53935;
+  background: #ffebee;
+}
+
+.detail-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 6px;
+}
+
+.detail-content {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #555;
+  white-space: pre-wrap;
+}
+
+/* Interactive Elements */
+#clear-history {
+  background: linear-gradient(135deg, #1d9bf0, #1993e6);
+  color: white;
+  border: none;
+  border-radius: 28px;
+  padding: 12px 24px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 8px rgba(29,155,240,0.2);
+}
+
+#clear-history:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(29,155,240,0.3);
+}
+
+#clear-history:disabled {
+  background: #e0e0e0;
+  color: #999;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Responsive Layout */
+@media (max-width: 480px) {
+  html, body {
+    width: 100%;
+    padding: 10px;
+  }
+
+  .probability-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+details summary {
+  cursor: pointer;
+  font-weight: 500;
+  margin-bottom: 8px;
+  color: #1d72b8;
+}
+
+details summary::after {
+  content: ' ▼';
+  font-size: 10px;
+}
+
+details[open] summary::after {
+  content: ' ▲';
+  font-size: 10px;
+}
