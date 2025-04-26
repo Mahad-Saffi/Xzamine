@@ -1,114 +1,114 @@
-// Log to confirm the content script is running
 console.log('Content script running...');
 
-// Function to append a button to the specified div in all posts
 const appendButtonToPosts = () => {
-    
-    // Grab html of the document using html tag
-    const html = document.querySelector('html');
-
-    // grabing div that contain the post (parent div) using the class="css-175oi2r r-1iusvr4 r-16y2uox r-1777fci r-kzbkwu" of div
     const postDiv = document.querySelectorAll('.css-175oi2r.r-1iusvr4.r-16y2uox.r-1777fci.r-kzbkwu');
 
     postDiv.forEach((post) => {
-        // Grab the button div of parent div using the class "css-175oi2r r-1awozwy r-18u37iz r-1cmwbt1 r-1wtj0ep" of div
         const buttonDiv = post.querySelector('.css-175oi2r.r-1awozwy.r-18u37iz.r-1cmwbt1.r-1wtj0ep');
-        
-        // Grab text of the post in the span tag using the class "css-1jxf684 r-bcqeeo r-1ttztb7 r-qvutc0 r-poiln3" of span
         const postText = post.querySelectorAll('.css-1jxf684.r-bcqeeo.r-1ttztb7.r-qvutc0.r-poiln3');
 
-        // Check if the button is already appended
-        if (!buttonDiv.querySelector('.custom-button')) {
-            // Create a new button
+        if (buttonDiv && !buttonDiv.querySelector('.custom-button')) {
             const button = document.createElement('button');
             button.innerText = 'Analyze';
             button.className = 'custom-button';
-            if (html.style.colorScheme === 'dark') {
-                button.style.colorScheme = 'dark';
-                button.style.backgroundColor = '#eff3f4';
-                button.style.color = '#0f1419';
-                button.style.borderColor = '#000000';
-            } else if (html.style.colorScheme === 'light') {
-                button.style.colorScheme = 'light';
-                button.style.backgroundColor = '#0f1419';
-                button.style.color = '#eff3f4';
-            }
-            button.style.cursor = 'pointer';
-            button.style.padding = '7px 16px';
+            // Add your styling here
+            button.style.cssText = `
+                margin-left: 10px;
+                padding: 4px 12px;
+                border-radius: 20px;
+                border: 1px solid #1d9bf0;
+                background-color: #1d9bf0;
+                color: white;
+                font-weight: bold;
+                cursor: pointer;
+                transition: all 0.2s;
+            `;
 
-            // make below style important to override the default style of the button
-            button.style.setProperty('border-bottom-left-radius', '9999px', 'important');
-            button.style.setProperty('border-bottom-right-radius', '9999px', 'important');
-            button.style.setProperty('border-top-left-radius', '9999px', 'important');
-            button.style.setProperty('border-top-right-radius', '9999px', 'important');
-
-            button.style.borderWidth = '1px';
-            button.style.borderStyle = 'solid';
-            button.style.fontSize = '15px';
-            button.style.fontWeight = '700';
-            button.style.borderRadius = '999px';
-            button.style.textAlign = 'center';
-            button.style.opacity = '1';
-            
-            button.classList.add('r-sdzlij');
-            button.classList.add('r-37j5jr');
-            // Add click event listener to the button
             button.addEventListener('click', () => {
                 button.innerText = 'Checking...';
-                console.log('Button clicked!');
+                const allPostText = Array.from(postText).map(text => text.innerText);
+                const postOwner = allPostText[0] || '';
+                const postOwnerUsername = allPostText[3] || '';
+                const postTextBody = allPostText.length >= 9 
+                    ? allPostText.slice(5, -4).join(' ') 
+                    : allPostText.join(' ') || 'No text';
 
-                // gather all the innertext of the post in an array
-                const allPostText = Array.from(postText).map(text => text.innerText)
-                
-                // remove the first five elements and last four elements of the array
-                const postOwner = allPostText[0];
-                const postOwnerUsername = allPostText[3];
-                const postTextBody = allPostText.slice(5, -4);
-                
-                console.log('All Post text:', allPostText);
-
-                // Send the data to the background script
                 chrome.runtime.sendMessage({
-                    postOwner: postOwner,
-                    postOwnerUsername: postOwnerUsername,
-                    postTextBody: postTextBody.join(' '),
-                    
+                    action: 'analyze_post',
+                    postOwner,
+                    postOwnerUsername,
+                    postTextBody
                 }, (response) => {
-                    console.log('Response from background script:', response);
-                    button.innerText = response.message;     // Update button text based on response
-                    button.style.opacity = '1';             // make the button opaque
+                    if (!response) {
+                        handleError(button);
+                        return;
+                    }
                     
-                    // Change button color based on response
-                    if (response.status === 'success' && response.sentiment === 'Normal Post') {
-                        button.innerText = response.sentiment; // Update button text
-                        button.style.backgroundColor = '#328c14'; // green color
-                        button.style.borderColor = '#328c14'; // green color
+                    if (response.status === 'success') {
+                        button.style.opacity = '1';
+                        button.innerText = response.sentiment;
                         
-                    } else if (response.status === 'success' && response.sentiment !== 'Normal Post') {
-                        button.innerText = response.sentiment; // Update button text
-                        button.style.backgroundColor = '#dc1919'; // red color
-                        button.style.borderColor = '#dc1919'; // red color
-                        // button.disabled = true; // disable the button
-
+                        if (response.sentiment === 'Normal Post') {
+                            button.style.backgroundColor = '#328c14';
+                            button.style.borderColor = '#328c14';
+                        } else {
+                            // Red color for any non-normal sentiment
+                            button.style.backgroundColor = '#dc1919';
+                            button.style.borderColor = '#dc1919';
+                        }
+                        
+                        if (response.task_id) {
+                            chrome.storage.local.set({
+                                [response.task_id]: {
+                                    post: postTextBody,
+                                    sentiment: response.sentiment,
+                                    confidence: response.confidence,
+                                    task_id: response.task_id,
+                                    status: 'pending'
+                                }
+                            });
+                            pollDetailedAnalysis(response.task_id, button);
+                        }
                     } else {
-                        button.innerText = 'Normal Post'; // Update button text
-                        button.style.opacity = '0.5';
+                        handleError(button);
                     }
                 });
             });
 
-            // Append the button to the post
             buttonDiv.appendChild(button);
         }
     });
 };
 
-// Observe changes in the DOM to dynamically add buttons to new posts
-const observer = new MutationObserver(() => {
-    appendButtonToPosts();
-});
+const handleError = (button) => {
+    console.error('Analysis failed');
+    button.innerText = 'Normal';
+    button.style.backgroundColor = '#328c14';  // Green color
+    button.style.borderColor = '#328c14';
+    button.style.opacity = '0.5';  // Half opacity for error state
+};
 
+const pollDetailedAnalysis = (taskId, button) => {
+    const pollInterval = setInterval(() => {
+        chrome.runtime.sendMessage({
+            action: 'poll_task',
+            task_id: taskId
+        }, (response) => {
+            if (response.status === 'completed') {
+                clearInterval(pollInterval);
+                button.title = `Confidence: ${response.result.confidence_score}\n` +
+                             `Toxic Score: ${response.result.toxic_score}\n` +
+                             `Rationale: ${response.result.rationale}\n` +
+                             `Cultural Context: ${response.result.cultural_context}`;
+            } else if (response.status === 'failed') {
+                clearInterval(pollInterval);
+                handleError(button);
+                button.title = 'Analysis failed';
+            }
+        });
+    }, 2000);
+};
+
+const observer = new MutationObserver(appendButtonToPosts);
 observer.observe(document.body, { childList: true, subtree: true });
-
-// Initial call to add buttons to existing posts
 appendButtonToPosts();
