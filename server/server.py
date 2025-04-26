@@ -22,19 +22,25 @@ def home():
 @app.route("/data", methods=["POST"])
 def get_data():
     try:
+        raw_data = request.get_data(as_text=True)
+        logger.info(f"Raw request body: {raw_data}")
+        
+        if not request.is_json:
+            return jsonify({"error": "Request must have Content-Type: application/json"}), 400
+        
         data = request.json
+        if not data:
+            return jsonify({"error": "Empty JSON payload"}), 400
+            
         post = data.get("postTextBody", "")
         
-        # Ensure post is a string
         if not isinstance(post, str):
             return jsonify({"error": "Invalid post text"}), 400
         
         sentiment_result = invoke_sentiment(post)
-        # Add validation for sentiment_result structure
         if "final_sentiment" not in sentiment_result:
-            raise ValueError("Invalid sentiment result")
+            raise ValueError("Invalid sentiment result: 'final_sentiment' is missing")
         
-        # Proceed with task creation
         task = process_detailed_analysis.delay(post, sentiment_result["final_sentiment"])
         return jsonify({
             "sentiment": sentiment_result["final_sentiment"],
@@ -43,7 +49,7 @@ def get_data():
             "received": data
         })
     except Exception as e:
-        logger.exception("Error in /data endpoint")  # Log full traceback
+        logger.exception(f"Error in /data endpoint: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
 @app.route("/task/<task_id>", methods=["GET"])
@@ -54,10 +60,12 @@ def get_task_result(task_id):
             if task.successful():
                 return jsonify({"status": "completed", "result": task.get()})
             else:
-                return jsonify({"status": "failed", "error": str(task.get(propagate=False))}), 500
+                error = str(task.get(propagate=False))
+                logger.error(f"Task failed with error: {error}", exc_info=True)
+                return jsonify({"status": "failed", "error": error}), 500
         return jsonify({"status": "pending"})
     except Exception as e:
-        logger.error(f"Error retrieving task result: {e}")
+        logger.error(f"Error retrieving task result: {str(e)}", exc_info=True)
         return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
