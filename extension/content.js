@@ -36,6 +36,7 @@ const appendButtonToPosts = () => {
                     : allPostText.join(' ') || 'No text';
 
                 try {
+                    // Send request to analyze the post
                     const analyzeResponse = await new Promise((resolve, reject) => {
                         chrome.runtime.sendMessage({
                             action: 'analyze_post',
@@ -53,46 +54,7 @@ const appendButtonToPosts = () => {
                         });
                     });
 
-                    let detailedAnalysis = null;
-                    if (analyzeResponse.task_id) {
-                        detailedAnalysis = await new Promise((resolve, reject) => {
-                            const pollTask = async () => {
-                                try {
-                                    const response = await fetch(`http://127.0.0.1:3000/task/${analyzeResponse.task_id}`, {
-                                        method: 'GET',
-                                        headers: {'Content-Type': 'application/json'}
-                                    });
-                                    const data = await response.json();
-                                    if (data.status === 'completed') {
-                                        resolve(data.result);
-                                    } else if (data.status === 'failed') {
-                                        reject(new Error(data.error));
-                                    } else {
-                                        setTimeout(pollTask, 2000);
-                                    }
-                                } catch (error) {
-                                    reject(error);
-                                }
-                            };
-                            pollTask();
-                        });
-                    }
-
-                    const reportButton = document.createElement('button');
-                    reportButton.innerText = 'Show Report';
-                    reportButton.className = 'report-button';
-                    reportButton.style.cssText = `
-                        margin-left: 10px;
-                        padding: 4px 12px;
-                        border-radius: 20px;
-                        border: 1px solid #328c14;
-                        background-color: #328c14;
-                        color: white;
-                        font-weight: bold;
-                        cursor: pointer;
-                        transition: all 0.2s;
-                    `;
-
+                    // Update button with sentiment immediately
                     button.innerText = analyzeResponse.sentiment;
                     button.style.opacity = '1';
                     button.disabled = false;
@@ -104,8 +66,50 @@ const appendButtonToPosts = () => {
                         button.style.borderColor = '#dc1919';
                     }
 
-                    reportButton.addEventListener('click', () => {
-                        const resultsPage = `
+                    // If there's a task_id, poll for detailed analysis in the background
+                    if (analyzeResponse.task_id) {
+                        const pollForDetailedAnalysis = async () => {
+                            try {
+                                const detailedAnalysis = await new Promise((resolve, reject) => {
+                                    const pollTask = async () => {
+                                        try {
+                                            const response = await fetch(`http://127.0.0.1:3000/task/${analyzeResponse.task_id}`, {
+                                                method: 'GET',
+                                                headers: {'Content-Type': 'application/json'}
+                                            });
+                                            const data = await response.json();
+                                            if (data.status === 'completed') {
+                                                resolve(data.result);
+                                            } else if (data.status === 'failed') {
+                                                reject(new Error(data.error));
+                                            } else {
+                                                setTimeout(pollTask, 2000);
+                                            }
+                                        } catch (error) {
+                                            reject(error);
+                                        }
+                                    };
+                                    pollTask();
+                                });
+
+                                // Create "Show Report" button after detailed analysis is received
+                                const reportButton = document.createElement('button');
+                                reportButton.innerText = 'Show Report';
+                                reportButton.className = 'report-button';
+                                reportButton.style.cssText = `
+                                    margin-left: 10px;
+                                    padding: 4px 12px;
+                                    border-radius: 20px;
+                                    border: 1px solid #328c14;
+                                    background-color: #328c14;
+                                    color: white;
+                                    font-weight: bold;
+                                    cursor: pointer;
+                                    transition: all 0.2s;
+                                `;
+
+                                reportButton.addEventListener('click', () => {
+                                    const resultsPage = `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -321,16 +325,41 @@ const appendButtonToPosts = () => {
     </div>
 </body>
 </html>
-                        `;
+                                    `;
 
-                        const dataUrl = 'data:text/html;charset=utf-8,' + encodeURIComponent(resultsPage);
-                        chrome.runtime.sendMessage({
-                            action: 'open_results_tab',
-                            url: dataUrl
-                        });
-                    });
+                                    const dataUrl = 'data:text/html;charset=utf-8,' + encodeURIComponent(resultsPage);
+                                    chrome.runtime.sendMessage({
+                                        action: 'open_results_tab',
+                                        url: dataUrl
+                                    });
+                                });
 
-                    button.parentNode.replaceChild(reportButton, button);
+                                buttonDiv.appendChild(reportButton);
+                            } catch (error) {
+                                console.error('Error polling detailed analysis:', error.message);
+                                // Optionally, display an error state for the report button
+                                const errorButton = document.createElement('button');
+                                errorButton.innerText = 'Report Failed';
+                                errorButton.className = 'report-button';
+                                errorButton.style.cssText = `
+                                    margin-left: 10px;
+                                    padding: 4px 12px;
+                                    border-radius: 20px;
+                                    border: 1px solid #dc1919;
+                                    background-color: #dc1919;
+                                    color: white;
+                                    font-weight: bold;
+                                    cursor: not-allowed;
+                                    transition: all 0.2s;
+                                    opacity: 0.5;
+                                `;
+                                buttonDiv.appendChild(errorButton);
+                            }
+                        };
+
+                        // Start polling in the background
+                        pollForDetailedAnalysis();
+                    }
                 } catch (error) {
                     console.error('Error:', error.message);
                     button.innerText = 'Error';
