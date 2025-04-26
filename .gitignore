@@ -1,4 +1,4 @@
 .env
 test.py
-__pycache__/
-*.pyc
+./server/__pycache__/
+./server/*.pyc
